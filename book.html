@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Details</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .book-container {
+      display: flex;
+      gap: 30px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .book-cover img {
+      max-width: 220px;
+      border-radius: 5px;
+    }
+    .book-details {
+      flex: 1;
+    }
+    .book-details h2 {
+      margin: 0 0 10px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .btn i {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Book Details</h1>
+  <div id="bookInfo">Loading...</div>
+
+  <script>
+    const bookId = localStorage.getItem("bookId");
+    const bookInfoDiv = document.getElementById("bookInfo");
+
+    async function fetchBookDetails() {
+      if (!bookId) return bookInfoDiv.textContent = "No book ID found.";
+
+      try {
+        const res = await fetch(`https://openlibrary.org${bookId}.json`);
+        const book = await res.json();
+        document.title = book.title || "Book Details";
+
+        const cover = book.covers?.[0]
+          ? `https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg`
+          : "https://via.placeholder.com/220x330?text=No+Cover";
+
+        const desc = typeof book.description === "string"
+          ? book.description
+          : book.description?.value || "No description available.";
+
+        const year = book.created ? new Date(book.created.value).getFullYear() : "Unknown year";
+        const amazonUrl = `https://www.amazon.com/s?k=${encodeURIComponent(book.title)}`;
+
+        let author = "Unknown author";
+        if (book.authors?.length) {
+          const authorRes = await fetch(`https://openlibrary.org${book.authors[0].author.key}.json`);
+          author = (await authorRes.json()).name || author;
+        }
+
+        bookInfoDiv.innerHTML = `
+          <div class="book-container">
+            <div class="book-cover">
+              <img src="${cover}" alt="Book cover">
+            </div>
+            <div class="book-details">
+              <h2>${book.title}</h2>
+              <p><strong>Author:</strong> ${author}</p>
+              <p><strong>Published:</strong> ${year}</p>
+              <p><strong>Description:</strong></p>
+              <p>${desc}</p>
+              <a href="index.html" class="btn">← Back to search</a>
+              <a href="${amazonUrl}" class="btn" target="_blank">
+                <i class="fas fa-shopping-cart"></i> Buy on Amazon
+              </a>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        console.error(err);
+        bookInfoDiv.textContent = "Error loading book details.";
+      }
+    }
+
+    fetchBookDetails();
+  </script>
+</body>
+</html>
