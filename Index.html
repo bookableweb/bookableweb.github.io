@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bookable</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 40px; color: #333; }
+    h1 { text-align: center; font-size: 3em; margin-bottom: 30px; color: black; }
+    .search-container { display: flex; justify-content: center; margin-bottom: 20px; }
+    #searchInput { width: 350px; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 5px; margin-right: 10px; }
+    button { padding: 12px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    .subject-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
+    #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; margin-top: 20px; }
+    .book-item { cursor: pointer; text-align: center; border: 1px solid #ddd; padding: 20px; border-radius: 10px; background-color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+    .book-item:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
+    .book-item img { max-width: 180px; height: auto; border-radius: 5px; margin-bottom: 15px; }
+    .book-item div { font-weight: bold; color: #007bff; margin-bottom: 5px; }
+    .book-item .author { font-size: 0.9em; color: #555; }
+    .no-results { text-align: center; font-size: 1.2em; color: #777; }
+    footer { margin-top: 60px; text-align: center; color: #555; }
+    footer hr { margin-bottom: 10px; }
+    footer a { color: #007bff; text-decoration: none; font-weight: bold; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Bookable</h1>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search for books...">
+    <button onclick="searchHandler()">Search</button>
+  </div>
+
+  <div class="subject-buttons">
+    <button onclick="subjectHandler('fiction')">Fiction</button>
+    <button onclick="subjectHandler('history')">History</button>
+    <button onclick="subjectHandler('fantasy')">Fantasy</button>
+    <button onclick="subjectHandler('romance')">Romance</button>
+    <button onclick="subjectHandler('poetry')">Poetry</button>
+    <button onclick="subjectHandler('lgbtq')">LGBTQ+</button>
+    <button onclick="subjectHandler('mental_health')">Mental Health</button>
+    <button onclick="subjectHandler('self-help')">Self-help</button>
+  </div>
+
+  <div id="results"></div>
+
+  <footer>
+    <hr>
+    <div>
+      <a href="index.html">Bookable</a> &middot;
+      <a href="https://forms.gle/ooHKcsDwsEKr9ZGfA" target="_blank">Contacts</a> &middot;
+      <a href="about.html">About</a>
+    </div>
+  </footer>
+
+
+  <script>
+    async function searchBooks(query) {
+      const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      return data.docs || [];
+    }
+
+    async function fetchBooksBySubject(subject) {
+      const res = await fetch(`https://openlibrary.org/subjects/${subject}.json?limit=12`);
+      const data = await res.json();
+      return data.works || [];
+    }
+
+    function displayBooks(books) {
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = books.length ? books.map(book => `
+        <div class="book-item" onclick="localStorage.setItem('bookId', '${book.key}'); window.location.href='book.html';">
+          <img src="https://covers.openlibrary.org/b/id/${book.cover_i || book.cover_id || '0'}-M.jpg" alt="Book cover">
+          <div>${book.title}</div>
+          <div class="author">${book.author_name?.join(', ') || book.authors?.map(a => a.name).join(', ') || 'Unknown author'}</div>
+        </div>
+      `).join('') : '<div class="no-results">No results found.</div>';
+    }
+
+    function searchHandler() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) searchBooks(query).then(displayBooks);
+    }
+
+    function subjectHandler(subject) {
+      fetchBooksBySubject(subject).then(displayBooks);
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', e => e.key === 'Enter' && searchHandler());
+  </script>
+</body>
+</html>
