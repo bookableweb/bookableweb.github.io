@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Author Details</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .author-container {
+      display: flex;
+      gap: 30px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .author-details {
+      flex: 1;
+    }
+    .author-details h2 {
+      margin: 0 0 10px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .btn i {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Author Details</h1>
+  <div id="authorInfo">Loading...</div>
+
+  <script>
+    const authorKey = localStorage.getItem("authorKey");
+    const authorInfoDiv = document.getElementById("authorInfo");
+
+    async function fetchAuthorDetails() {
+      if (!authorKey) {
+        return authorInfoDiv.textContent = "No author selected.";
+      }
+
+      try {
+        // Fetch author details from OpenLibrary using the author's key
+        const authorRes = await fetch(`https://openlibrary.org${authorKey}.json`);
+        if (!authorRes.ok) {
+          throw new Error('Failed to fetch author details from OpenLibrary.');
+        }
+
+        const authorData = await authorRes.json();
+        const authorName = authorData.name || "Unknown Author";
+
+        // Set the page title dynamically to the author's name
+        document.title = `${authorName} - Author Details`;
+
+        // Fetch biographical data from Wikipedia using the author's name
+        const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(authorName)}`);
+        const wikiData = await wikiRes.json();
+
+        const biography = wikiData.extract || "No biography available.";
+
+        // Display the author details and biography without the "Biography:" label
+        authorInfoDiv.innerHTML = `
+          <div class="author-container">
+            <div class="author-details">
+              <h2>${authorName}</h2>
+              <p>${biography}</p>
+              <a href="index.html" class="btn">← Back to Search</a>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        console.error(err);
+        authorInfoDiv.textContent = `Error loading author details: ${err.message}`;
+      }
+    }
+
+    fetchAuthorDetails();
+  </script>
+</body>
+</html>
