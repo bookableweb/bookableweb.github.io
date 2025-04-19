@@ -29,6 +29,17 @@
       max-width: 220px;
       border-radius: 5px;
     }
+    .cover-placeholder {
+      width: 220px;
+      height: 330px;
+      background-color: #ddd;
+      border-radius: 5px;
+      font-size: 150px;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .book-details {
       flex: 1;
     }
@@ -70,9 +81,10 @@
         const book = await res.json();
         document.title = book.title || "Book Details";
 
-        const cover = book.covers?.[0]
-          ? `https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg`
-          : "https://via.placeholder.com/220x330?text=No+Cover";
+        const hasCover = book.covers?.[0];
+        const coverHtml = hasCover
+          ? `<img src="https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg" alt="Book cover">`
+          : `<div class="cover-placeholder">?</div>`;
 
         const desc = typeof book.description === "string"
           ? book.description
@@ -90,7 +102,7 @@
         bookInfoDiv.innerHTML = `
           <div class="book-container">
             <div class="book-cover">
-              <img src="${cover}" alt="Book cover">
+              ${coverHtml}
             </div>
             <div class="book-details">
               <h2>${book.title}</h2>
