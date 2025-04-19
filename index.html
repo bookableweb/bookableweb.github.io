@@ -17,6 +17,7 @@
     .book-item { cursor: pointer; text-align: center; border: 1px solid #ddd; padding: 20px; border-radius: 10px; background-color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
     .book-item:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
     .book-item img { max-width: 180px; height: auto; border-radius: 5px; margin-bottom: 15px; }
+    .cover-placeholder { width: 180px; height: 260px; background-color: #ddd; border-radius: 5px; font-size: 100px; color: #aaa; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
     .book-item div { font-weight: bold; color: #007bff; margin-bottom: 5px; }
     .book-item .author { font-size: 0.9em; color: #555; }
     .no-results { text-align: center; font-size: 1.2em; color: #777; }
@@ -56,7 +57,6 @@
     </div>
   </footer>
 
-
   <script>
     async function searchBooks(query) {
       const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`);
@@ -72,13 +72,23 @@
 
     function displayBooks(books) {
       const resultsContainer = document.getElementById('results');
-      resultsContainer.innerHTML = books.length ? books.map(book => `
-        <div class="book-item" onclick="localStorage.setItem('bookId', '${book.key}'); window.location.href='book.html';">
-          <img src="https://covers.openlibrary.org/b/id/${book.cover_i || book.cover_id || '0'}-M.jpg" alt="Book cover">
-          <div>${book.title}</div>
-          <div class="author">${book.author_name?.join(', ') || book.authors?.map(a => a.name).join(', ') || 'Unknown author'}</div>
-        </div>
-      `).join('') : '<div class="no-results">No results found.</div>';
+      resultsContainer.innerHTML = books.length ? books.map(book => {
+        const coverId = book.cover_i || book.cover_id;
+        const hasCover = !!coverId;
+        const coverHtml = hasCover
+          ? `<img src="https://covers.openlibrary.org/b/id/${coverId}-M.jpg" alt="Book cover">`
+          : `<div class="cover-placeholder">?</div>`;
+        const title = book.title || 'Untitled';
+        const author = book.author_name?.join(', ') || book.authors?.map(a => a.name).join(', ') || 'Unknown author';
+
+        return `
+          <div class="book-item" onclick="localStorage.setItem('bookId', '${book.key}'); window.location.href='book.html';">
+            ${coverHtml}
+            <div>${title}</div>
+            <div class="author">${author}</div>
+          </div>
+        `;
+      }).join('') : '<div class="no-results">No results found.</div>';
     }
 
     function searchHandler() {
