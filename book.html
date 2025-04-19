@@ -49,13 +49,18 @@
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       margin-top: 20px;
+      margin-right: 10px;
       padding: 10px 20px;
       background: #007bff;
       color: #fff;
       text-decoration: none;
       border-radius: 5px;
       transition: background 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
     }
     .btn:hover {
       background: #0056b3;
@@ -83,7 +88,7 @@
 
         const hasCover = book.covers?.[0];
         const coverHtml = hasCover
-          ? `<img src="https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg" alt="Book cover">`
+          ? `<img src="https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg" alt="Cover of ${book.title}">`
           : `<div class="cover-placeholder">?</div>`;
 
         const desc = typeof book.description === "string"
@@ -93,11 +98,21 @@
         const year = book.created ? new Date(book.created.value).getFullYear() : "Unknown year";
         const amazonUrl = `https://www.amazon.com/s?k=${encodeURIComponent(book.title)}`;
 
-        let author = "Unknown author";
-        if (book.authors?.length) {
-          const authorRes = await fetch(`https://openlibrary.org${book.authors[0].author.key}.json`);
-          author = (await authorRes.json()).name || author;
+        let authorName = "Unknown author";
+        let authorKey = null;
+
+        if (book.authors?.[0]?.author?.key) {
+          authorKey = book.authors[0].author.key;
+          const authorRes = await fetch(`https://openlibrary.org${authorKey}.json`);
+          const authorData = await authorRes.json();
+          authorName = authorData.name || authorName;
         }
+
+        const discoverBtn = authorKey
+          ? `<button class="btn" onclick="localStorage.setItem('authorKey', '${authorKey}'); window.location.href='author.html'">
+               <i class="fas fa-user"></i> Discover Author
+             </button>`
+          : '';
 
         bookInfoDiv.innerHTML = `
           <div class="book-container">
@@ -106,14 +121,17 @@
             </div>
             <div class="book-details">
               <h2>${book.title}</h2>
-              <p><strong>Author:</strong> ${author}</p>
+              <p><strong>Author:</strong> ${authorName}</p>
               <p><strong>Published:</strong> ${year}</p>
               <p><strong>Description:</strong></p>
               <p>${desc}</p>
-              <a href="index.html" class="btn">← Back to search</a>
-              <a href="${amazonUrl}" class="btn" target="_blank">
-                <i class="fas fa-shopping-cart"></i> Buy on Amazon
-              </a>
+              <div style="display: flex; flex-wrap: wrap;">
+                <a href="index.html" class="btn">← Back to search</a>
+                <a href="${amazonUrl}" class="btn" target="_blank">
+                  <i class="fas fa-shopping-cart"></i> Buy on Amazon
+                </a>
+                ${discoverBtn}
+              </div>
             </div>
           </div>
         `;
