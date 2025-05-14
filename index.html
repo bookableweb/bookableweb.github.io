@@ -175,18 +175,6 @@
       text-decoration: underline;
     }
 
-    .favorite-icon {
-      font-size: 1.5em;
-      cursor: pointer;
-      color: #ccc;
-      transition: color 0.3s;
-      margin-top: 10px;
-    }
-
-    .favorite-icon.favorited {
-      color: red;
-    }
-
     /* Mobile Responsive Styles */
     @media (max-width: 768px) {
       body {
@@ -242,13 +230,13 @@
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search for books...">
     <button onclick="searchHandler()">Search</button>
-    <button onclick="window.location.href='favorites.html'">❤️</button>
+    <button onclick="window.location.href='favorites.html'">❤️ Favorites</button>
   </div>
 
   <div class="category-filter">
     <label for="categorySelect">Filter by category</label>
     <select id="categorySelect" onchange="subjectHandler(this.value)">
-      <option value="">Select a category</option>
+      <option value="">-- Select a category --</option>
       <option value="fiction">Fiction</option>
       <option value="history">History</option>
       <option value="fantasy">Fantasy</option>
@@ -286,22 +274,18 @@
 
     function displayBooks(books) {
       const resultsContainer = document.getElementById('results');
-      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-
       resultsContainer.innerHTML = books.length
         ? books.map(book => {
             const coverId = book.cover_i || book.cover_id;
             const title = book.title || 'Untitled';
             const key = book.key;
             const author = book.author_name?.join(', ') || book.authors?.map(a => a.name).join(', ') || 'Unknown author';
-            const isFavorited = favorites.some(fav => fav.key === key);
 
             return `
-              <div class="book-item">
-                <img src="https://covers.openlibrary.org/b/id/${coverId}-M.jpg" alt="Book cover" onclick="openBook('${key}')">
-                <div onclick="openBook('${key}')">${title}</div>
-                <div class="author" onclick="openBook('${key}')">${author}</div>
-                <div class="favorite-icon ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite(event, '${key}', '${title}', '${author}', '${coverId}')">❤️</div>
+              <div class="book-item" onclick="openBook('${key}')">
+                <img src="https://covers.openlibrary.org/b/id/${coverId}-M.jpg" alt="Book cover">
+                <div>${title}</div>
+                <div class="author">${author}</div>
               </div>
             `;
           }).join('')
@@ -311,22 +295,6 @@
     function openBook(key) {
       localStorage.setItem('bookId', key);
       window.location.href = 'book.html';
-    }
-
-    function toggleFavorite(e, key, title, author, coverId) {
-      e.stopPropagation();
-      let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-      const exists = favorites.some(book => book.key === key);
-
-      if (exists) {
-        favorites = favorites.filter(book => book.key !== key);
-        e.target.classList.remove('favorited');
-      } else {
-        favorites.push({ key, title, author, coverId });
-        e.target.classList.add('favorited');
-      }
-
-      localStorage.setItem('favorites', JSON.stringify(favorites));
     }
 
     function searchHandler() {
