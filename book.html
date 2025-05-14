@@ -42,6 +42,8 @@
       height: 330px;
       background-color: #ddd;
       border-radius: 5px;
+      font-size: 150px;
+      color: #aaa;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -75,15 +77,6 @@
     .btn i {
       margin-right: 10px;
     }
-    .favorite-btn {
-      cursor: pointer;
-      font-size: 24px;
-      color: #ccc;
-      margin-left: 20px;
-    }
-    .favorite-btn.liked {
-      color: #ff0000;
-    }
 
     /* Responsive styles */
     @media (max-width: 768px) {
@@ -116,30 +109,6 @@
     const bookId = localStorage.getItem("bookId");
     const bookInfoDiv = document.getElementById("bookInfo");
 
-    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
-    function toggleFavorite(book) {
-      const index = favorites.findIndex(fav => fav.key === book.key);
-
-      if (index === -1) {
-        favorites.push(book);
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-      } else {
-        favorites.splice(index, 1);
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-      }
-
-      updateFavoriteButton(book.key);
-    }
-
-    function updateFavoriteButton(bookId) {
-      const heartButton = document.querySelector(`#heart-${bookId}`);
-      if (!heartButton) return;
-
-      const isLiked = favorites.some(fav => fav.key === bookId);
-      heartButton.classList.toggle('liked', isLiked);
-    }
-
     async function fetchBookDetails() {
       if (!bookId) return bookInfoDiv.textContent = "No book ID found.";
 
@@ -151,7 +120,7 @@
         const hasCover = book.covers?.[0];
         const coverHtml = hasCover
           ? `<img src="https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg" alt="Cover of ${book.title}">`
-          : ''; // No placeholder for missing cover
+          : `<div class="cover-placeholder">?</div>`;
 
         const desc = typeof book.description === "string"
           ? book.description
@@ -193,15 +162,10 @@
                   <i class="fas fa-shopping-cart"></i> Buy on Amazon
                 </a>
                 ${discoverBtn}
-                <span class="favorite-btn" id="heart-${book.key}" onclick="toggleFavorite(${JSON.stringify(book)})">
-                  <i class="fas fa-heart"></i>
-                </span>
               </div>
             </div>
           </div>
         `;
-
-        updateFavoriteButton(book.key);
       } catch (err) {
         console.error(err);
         bookInfoDiv.textContent = "Error loading book details.";
