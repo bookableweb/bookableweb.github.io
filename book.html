@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-M8GHNKM551"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-M8GHNKM551');
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-M8GHNKM551"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-M8GHNKM551');
+  </script>
   <link rel="icon" href="https://avatars.githubusercontent.com/u/208142620?s=400&u=52a827835d079a2430ce3567ee3137821d4fe5d0&v=4" type="image/png">
   <meta charset="UTF-8">
   <title>Book Details</title>
@@ -17,7 +16,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
+      margin: 20px;
       background: #f9f9f9;
       color: #333;
     }
@@ -32,6 +31,7 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
     }
     .book-cover img {
       max-width: 220px;
@@ -42,14 +42,13 @@
       height: 330px;
       background-color: #ddd;
       border-radius: 5px;
-      font-size: 150px;
-      color: #aaa;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .book-details {
       flex: 1;
+      min-width: 300px;
     }
     .book-details h2 {
       margin: 0 0 10px;
@@ -76,6 +75,37 @@
     .btn i {
       margin-right: 10px;
     }
+    .favorite-btn {
+      cursor: pointer;
+      font-size: 24px;
+      color: #ccc;
+      margin-left: 20px;
+    }
+    .favorite-btn.liked {
+      color: #ff0000;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .book-container {
+        flex-direction: column;
+        padding: 20px;
+      }
+
+      .book-cover {
+        margin-bottom: 20px;
+      }
+
+      .book-details {
+        min-width: 0;
+      }
+
+      .btn {
+        width: 100%;
+        margin-top: 10px;
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -85,6 +115,30 @@
   <script>
     const bookId = localStorage.getItem("bookId");
     const bookInfoDiv = document.getElementById("bookInfo");
+
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    function toggleFavorite(book) {
+      const index = favorites.findIndex(fav => fav.key === book.key);
+
+      if (index === -1) {
+        favorites.push(book);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+      } else {
+        favorites.splice(index, 1);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+      }
+
+      updateFavoriteButton(book.key);
+    }
+
+    function updateFavoriteButton(bookId) {
+      const heartButton = document.querySelector(`#heart-${bookId}`);
+      if (!heartButton) return;
+
+      const isLiked = favorites.some(fav => fav.key === bookId);
+      heartButton.classList.toggle('liked', isLiked);
+    }
 
     async function fetchBookDetails() {
       if (!bookId) return bookInfoDiv.textContent = "No book ID found.";
@@ -97,7 +151,7 @@
         const hasCover = book.covers?.[0];
         const coverHtml = hasCover
           ? `<img src="https://covers.openlibrary.org/b/id/${book.covers[0]}-L.jpg" alt="Cover of ${book.title}">`
-          : `<div class="cover-placeholder">?</div>`;
+          : ''; // No placeholder for missing cover
 
         const desc = typeof book.description === "string"
           ? book.description
@@ -139,10 +193,15 @@
                   <i class="fas fa-shopping-cart"></i> Buy on Amazon
                 </a>
                 ${discoverBtn}
+                <span class="favorite-btn" id="heart-${book.key}" onclick="toggleFavorite(${JSON.stringify(book)})">
+                  <i class="fas fa-heart"></i>
+                </span>
               </div>
             </div>
           </div>
         `;
+
+        updateFavoriteButton(book.key);
       } catch (err) {
         console.error(err);
         bookInfoDiv.textContent = "Error loading book details.";
