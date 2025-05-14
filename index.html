@@ -2,82 +2,262 @@
 <html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-M8GHNKM551"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-M8GHNKM551"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-M8GHNKM551');
+  </script>
 
-  gtag('config', 'G-M8GHNKM551');
-</script>
-  <link rel="icon" href="https://avatars.githubusercontent.com/u/208142620?s=400&u=52a827835d079a2430ce3567ee3137821d4fe5d0&v=4" type="image/png">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bookable</title>
+  <link rel="icon" href="https://avatars.githubusercontent.com/u/208142620?s=400&u=52a827835d079a2430ce3567ee3137821d4fe5d0&v=4" type="image/png">
+
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 40px; color: #333; }
-    h1 { text-align: center; font-size: 3em; margin-bottom: 30px; color: black; }
-    .search-container { display: flex; justify-content: center; margin-bottom: 20px; }
-    #searchInput { width: 350px; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 5px; margin-right: 10px; }
-    button { padding: 12px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background-color: #0056b3; }
-    .subject-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
-    #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; margin-top: 20px; }
-    .book-item { 
-      cursor: pointer; 
-      text-align: center; 
-      border: 1px solid #ddd; 
-      padding: 20px; 
-      border-radius: 10px; 
-      background-color: white; 
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-      transition: transform 0.3s ease, box-shadow 0.3s ease; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: space-between; 
-      height: 400px; /* Fixed height for uniformity */
-      overflow: hidden; /* Ensures overflow content like long author names is hidden */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 40px;
+      color: #333;
     }
-    .book-item:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
-    .book-item img { max-width: 180px; height: 250px; border-radius: 5px; margin-bottom: 15px; object-fit: cover; }
-    .cover-placeholder { 
-      width: 180px; 
-      height: 250px; 
-      background-color: #888; /* Gray background for missing covers */
-      border-radius: 5px; 
-      font-size: 100px; 
-      color: #ccc; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      margin-bottom: 15px; 
+
+    h1 {
+      text-align: center;
+      font-size: 3em;
+      margin-bottom: 30px;
+      color: black;
     }
-    .book-item div { font-weight: bold; color: #007bff; margin-bottom: 5px; }
-    .book-item .author { font-size: 0.9em; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .no-results { text-align: center; font-size: 1.2em; color: #777; }
-    footer { margin-top: 60px; text-align: center; color: #555; }
-    footer hr { margin-bottom: 10px; }
-    footer a { color: #007bff; text-decoration: none; font-weight: bold; }
-    footer a:hover { text-decoration: underline; }
+
+    h1 span {
+      color: #007bff;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    #searchInput {
+      width: 350px;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .category-filter {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .category-filter label {
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .category-filter select {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      width: 220px;
+    }
+
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .book-item {
+      cursor: pointer;
+      text-align: center;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    .book-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .book-item img {
+      max-width: 180px;
+      height: 250px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      object-fit: cover;
+    }
+
+    .cover-placeholder {
+      width: 180px;
+      height: 250px;
+      background-color: #888;
+      border-radius: 5px;
+      font-size: 100px;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .book-item div {
+      font-weight: bold;
+      color: #007bff;
+      margin-bottom: 5px;
+    }
+
+    .book-item .author {
+      font-size: 0.9em;
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .no-results {
+      text-align: center;
+      font-size: 1.2em;
+      color: #777;
+    }
+
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      color: #555;
+    }
+
+    footer hr {
+      margin-bottom: 10px;
+    }
+
+    footer a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .favorite-icon {
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #ccc;
+      transition: color 0.3s;
+      margin-top: 10px;
+    }
+
+    .favorite-icon.favorited {
+      color: red;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      body {
+        margin: 20px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .search-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #searchInput {
+        width: 100%;
+      }
+
+      .category-filter select {
+        width: 100%;
+      }
+
+      #results {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+
+      .book-item {
+        height: auto;
+        padding: 15px;
+      }
+
+      .book-item img,
+      .cover-placeholder {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+      }
+
+      .book-item .author {
+        font-size: 0.8em;
+      }
+
+      footer {
+        font-size: 0.9em;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Bookable</h1>
+  <h1>Book<span>able</span></h1>
 
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search for books...">
     <button onclick="searchHandler()">Search</button>
+    <button onclick="window.location.href='favorites.html'">❤️</button>
   </div>
 
-  <div class="subject-buttons">
-    <button onclick="subjectHandler('fiction')">Fiction</button>
-    <button onclick="subjectHandler('history')">History</button>
-    <button onclick="subjectHandler('fantasy')">Fantasy</button>
-    <button onclick="subjectHandler('romance')">Romance</button>
-    <button onclick="subjectHandler('poetry')">Poetry</button>
-    <button onclick="subjectHandler('lgbtq')">LGBTQ+</button>
-    <button onclick="subjectHandler('mental_health')">Mental Health</button>
-    <button onclick="subjectHandler('self-help')">Self-help</button>
+  <div class="category-filter">
+    <label for="categorySelect">Filter by category</label>
+    <select id="categorySelect" onchange="subjectHandler(this.value)">
+      <option value="">Select a category</option>
+      <option value="fiction">Fiction</option>
+      <option value="history">History</option>
+      <option value="fantasy">Fantasy</option>
+      <option value="romance">Romance</option>
+      <option value="poetry">Poetry</option>
+      <option value="lgbtq">LGBTQ+</option>
+      <option value="mental_health">Mental Health</option>
+      <option value="self-help">Self-help</option>
+    </select>
   </div>
 
   <div id="results"></div>
@@ -95,34 +275,58 @@
     async function searchBooks(query) {
       const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`);
       const data = await res.json();
-      return data.docs || [];
+      return (data.docs || []).filter(book => book.cover_i);
     }
 
     async function fetchBooksBySubject(subject) {
       const res = await fetch(`https://openlibrary.org/subjects/${subject}.json?limit=12`);
       const data = await res.json();
-      return data.works || [];
+      return (data.works || []).filter(book => book.cover_id);
     }
 
     function displayBooks(books) {
       const resultsContainer = document.getElementById('results');
-      resultsContainer.innerHTML = books.length ? books.map(book => {
-        const coverId = book.cover_i || book.cover_id;
-        const hasCover = !!coverId;
-        const coverHtml = hasCover
-          ? `<img src="https://covers.openlibrary.org/b/id/${coverId}-M.jpg" alt="Book cover">`
-          : `<div class="cover-placeholder">?</div>`;
-        const title = book.title || 'Untitled';
-        const author = book.author_name?.join(', ') || book.authors?.map(a => a.name).join(', ') || 'Unknown author';
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 
-        return `
-          <div class="book-item" onclick="localStorage.setItem('bookId', '${book.key}'); window.location.href='book.html';">
-            ${coverHtml}
-            <div>${title}</div>
-            <div class="author">${author}</div>
-          </div>
-        `;
-      }).join('') : '<div class="no-results">No results found.</div>';
+      resultsContainer.innerHTML = books.length
+        ? books.map(book => {
+            const coverId = book.cover_i || book.cover_id;
+            const title = book.title || 'Untitled';
+            const key = book.key;
+            const author = book.author_name?.join(', ') || book.authors?.map(a => a.name).join(', ') || 'Unknown author';
+            const isFavorited = favorites.some(fav => fav.key === key);
+
+            return `
+              <div class="book-item">
+                <img src="https://covers.openlibrary.org/b/id/${coverId}-M.jpg" alt="Book cover" onclick="openBook('${key}')">
+                <div onclick="openBook('${key}')">${title}</div>
+                <div class="author" onclick="openBook('${key}')">${author}</div>
+                <div class="favorite-icon ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite(event, '${key}', '${title}', '${author}', '${coverId}')">❤️</div>
+              </div>
+            `;
+          }).join('')
+        : '<div class="no-results">No results found.</div>';
+    }
+
+    function openBook(key) {
+      localStorage.setItem('bookId', key);
+      window.location.href = 'book.html';
+    }
+
+    function toggleFavorite(e, key, title, author, coverId) {
+      e.stopPropagation();
+      let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      const exists = favorites.some(book => book.key === key);
+
+      if (exists) {
+        favorites = favorites.filter(book => book.key !== key);
+        e.target.classList.remove('favorited');
+      } else {
+        favorites.push({ key, title, author, coverId });
+        e.target.classList.add('favorited');
+      }
+
+      localStorage.setItem('favorites', JSON.stringify(favorites));
     }
 
     function searchHandler() {
@@ -131,7 +335,9 @@
     }
 
     function subjectHandler(subject) {
-      fetchBooksBySubject(subject).then(displayBooks);
+      if (subject) {
+        fetchBooksBySubject(subject).then(displayBooks);
+      }
     }
 
     document.getElementById('searchInput').addEventListener('keydown', e => e.key === 'Enter' && searchHandler());
